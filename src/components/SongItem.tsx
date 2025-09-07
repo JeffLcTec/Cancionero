@@ -1,15 +1,16 @@
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { Edit, Plus } from 'lucide-react';
+import { Edit, Plus, Trash2 } from 'lucide-react';
 import type { Song } from '../types/song';
 
 interface SongItemProps {
   song: Song;
   onToggleSelect: (id: string) => void;
   onEdit: (song: Song) => void;
+  onDelete: (id: string) => void;
 }
 
-export function SongItem({ song, onToggleSelect, onEdit }: SongItemProps) {
+export function SongItem({ song, onToggleSelect, onEdit, onDelete }: SongItemProps) {
   return (
     <Card className="w-full">
       <CardContent className="p-4">
@@ -37,7 +38,10 @@ export function SongItem({ song, onToggleSelect, onEdit }: SongItemProps) {
               )}
             </div>
             <div className="flex-1">
-              <div className="cursor-pointer select-none text-lg font-medium" onClick={() => onToggleSelect(song.id)}>
+              <div
+                className="cursor-pointer select-none text-lg font-medium"
+                onClick={() => onToggleSelect(song.id)}
+              >
                 {song.name}
               </div>
               {(song.lyrics || song.chords) && (
@@ -49,22 +53,40 @@ export function SongItem({ song, onToggleSelect, onEdit }: SongItemProps) {
                   )}
                   {song.chords && (
                     <p className="text-sm text-muted-foreground font-mono">
-                      Acordes: {song.chords.substring(0, 50)}{song.chords.length > 50 ? '...' : ''}
+                      Acordes: {song.chords.substring(0, 50)}
+                      {song.chords.length > 50 ? '...' : ''}
                     </p>
                   )}
                 </div>
               )}
             </div>
           </div>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onEdit(song)}
-            className="ml-4"
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
+
+          {/* Botones en columna */}
+          <div className="flex flex-col items-center gap-2 ml-4">
+            <Button
+              variant="outline"
+              style={{ borderColor: '#5682B1' ,color : '#5682B1'}}
+              size="sm"
+              onClick={() => onEdit(song)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+
+            <Button
+              variant="outline"
+              style={{ borderColor: 'red' ,color : 'red'}}
+              size="icon"
+              onClick={() => {
+                if (confirm(`¿Seguro que quieres eliminar "${song.name}"?`)) {
+                  onDelete(song.id);
+                }
+              }}
+              className="text-red-500 hover:text-red-700"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

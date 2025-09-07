@@ -180,7 +180,7 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
 
     // estilo de letra (monoespaciado)
     doc.setTextColor(40, 40, 40);
-    doc.setFont("courier", "normal");
+    doc.setFont("courier", "bold");
     doc.setFontSize(11);
 
     const lyricsLines = doc.splitTextToSize(song.lyrics || "", CONTENT_W);
@@ -191,7 +191,7 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
       doc.setLineWidth(1);
       doc.line(MARGIN_X - 10, yStart - 10, MARGIN_X - 10, PAGE_H - MARGIN_BOTTOM);
       doc.setTextColor(40, 40, 40);
-      doc.setFont("courier", "normal");
+      doc.setFont("courier", "bold");
       doc.setFontSize(11);
       return yStart;
     });
