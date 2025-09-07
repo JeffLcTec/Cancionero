@@ -16,6 +16,9 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
   });
 
   // ====== CONFIGURACIÓN ======
+
+  const CHORD_REGEX = /\b([A-G](#|b)?(m|maj7|m7|7|sus4|dim|aug)?(\/[A-G](#|b)?)?)\b/g;
+
   const PAGE_W = doc.internal.pageSize.getWidth();
   const PAGE_H = doc.internal.pageSize.getHeight();
   const MARGIN_X = 56;        // ~0.78"
@@ -173,33 +176,47 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
     doc.text("Letra", MARGIN_X, y);
     y += 14;
 
-    // guía lateral tenue
     doc.setDrawColor(230, 230, 230);
     doc.setLineWidth(1);
     doc.line(MARGIN_X - 10, y - 10, MARGIN_X - 10, PAGE_H - MARGIN_BOTTOM);
 
-    // estilo de letra (monoespaciado)
-    doc.setTextColor(40, 40, 40);
-    doc.setFont("courier", "bold");
+    doc.setFont("courier", "normal");
     doc.setFontSize(11);
 
-    const lyricsLines = doc.splitTextToSize(song.lyrics || "", CONTENT_W);
-    y = writeWrapped(lyricsLines, y, 16, () => {
-      // Continuación de Letra: reponer header y guía
-      const yStart = drawContinuationHeader(song.name, "Letra");
-      doc.setDrawColor(230, 230, 230);
-      doc.setLineWidth(1);
-      doc.line(MARGIN_X - 10, yStart - 10, MARGIN_X - 10, PAGE_H - MARGIN_BOTTOM);
-      doc.setTextColor(40, 40, 40);
-      doc.setFont("courier", "bold");
-      doc.setFontSize(11);
-      return yStart;
-    });
+    const lyricsLines = (song.lyrics || "").split("\n");
 
-    // Cerrar la última página utilizada por esta canción
+    for (let line of lyricsLines) {
+      if (y > PAGE_H - MARGIN_BOTTOM) {
+        nextPage();
+        y = drawContinuationHeader(song.name, "Letra");
+        doc.setDrawColor(230, 230, 230);
+        doc.setLineWidth(1);
+        doc.line(MARGIN_X - 10, y - 10, MARGIN_X - 10, PAGE_H - MARGIN_BOTTOM);
+      }
+
+      let cursorX = MARGIN_X;
+      const parts = line.split(/(\s+)/); // mantener espacios
+
+      for (let part of parts) {
+        if (!part) continue;
+
+        if (CHORD_REGEX.test(part)) {
+          // 🎵 Acorde → azul y bold
+          doc.setFont("courier", "bold");
+          doc.setTextColor(30, 90, 200);
+        } else {
+          // 🎤 Texto → negro normal
+          doc.setFont("courier", "normal");
+          doc.setTextColor(40, 40, 40);
+        }
+
+        doc.text(part, cursorX, y);
+        cursorX += doc.getTextWidth(part);
+      }
+      y += 16;
+    }
+
     drawFooter(currentPage);
-
-    // Si no es la última canción, forzamos nueva página para la siguiente
     if (i < selectedSongs.length - 1) {
       doc.addPage();
       currentPage += 1;
