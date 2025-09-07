@@ -5,86 +5,44 @@ import { SongItem } from './SongItem';
 import { AddSongModal } from './AddSongModal';
 import { EditSongModal } from './EditSongModal';
 import { generateSongbookPDF } from '../utils/pdfGenerator';
-import { Plus, Download, Search, Trash2 } from 'lucide-react';
+import { Plus, Download, Search } from 'lucide-react';
 import type { Song } from '../types/song';
-
-const API_URL =
-  (import.meta as any)?.env?.VITE_API_URL || 'http://localhost:8787';
-
-// ===== Semilla (por si el server no responde en local) =====
-const defaultSongs: Song[] = [
-  // … (tu lista grande tal cual la tienes)
-];
+import { supabase } from '../utils/supabaseClient.ts';
 
 // ===== Componente =====
 export function SongManager() {
-  const [songs, setSongs] = useState([] as Song[]);
+  const [songs, setSongs] = useState<Song[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingSong, setEditingSong] = useState(null as Song | null);
+  const [editingSong, setEditingSong] = useState<Song | null>(null);
 
-  // ------- API helpers -------
-  async function apiAddSong(payload: Pick<Song, 'name' | 'lyrics' | 'chords'>) {
-    const res = await fetch(`${API_URL}/songs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) throw new Error('No se pudo crear');
-    return res.json() as Promise<Song>;
-  }
-
-  async function apiUpdateSong(id: string, partial: Partial<Song>) {
-    // Solo mandamos campos persistidos en BD
-    const body: Partial<Song> = {};
-    if (partial.name !== undefined) body.name = partial.name;
-    if (partial.lyrics !== undefined) body.lyrics = partial.lyrics;
-    if (partial.chords !== undefined) body.chords = partial.chords;
-
-    const res = await fetch(`${API_URL}/songs/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error('No se pudo actualizar');
-    return res.json() as Promise<Song>;
-  }
-
-  async function apiDeleteSong(id: string) {
-    const res = await fetch(`${API_URL}/songs/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('No se pudo eliminar');
-    return res.json() as Promise<{ ok: boolean }>;
-  }
-
-  // ------- Carga inicial -------
+  // ------- Carga inicial desde Supabase -------
   useEffect(() => {
     (async () => {
-      try {
-        const r = await fetch(`${API_URL}/songs`);
-        const data: Song[] = await r.json();
-        if (Array.isArray(data) && data.length) {
-          setSongs(
-            data
-              .map((s) => ({ ...s, isSelected: false, selectionOrder: undefined }))
-              .sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })),
-          );
-        } else {
-          setSongs(defaultSongs);
-        }
-      } catch {
-        setSongs(defaultSongs);
+      const { data, error } = await supabase
+        .from('songs')
+        .select('*')
+        .order('name', { ascending: true });
+      if (!error && data) {
+        setSongs(
+          data.map((s) => ({
+            ...s,
+            isSelected: false,
+            selectionOrder: undefined,
+          }))
+        );
       }
     })();
   }, []);
 
-  // ------- Derivados / filtros -------
+  // ------- Derivados -------
   const filteredSongs = songs
     .filter((song) =>
-      song.name.toLowerCase().includes(searchTerm.toLowerCase()),
+      song.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) =>
-      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }),
+      a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
     );
 
   const selectedSongs = songs.filter((s) => s.isSelected);
@@ -92,24 +50,26 @@ export function SongManager() {
   // ------- Handlers -------
   const handleToggleSelect = (id: string) => {
     setSongs((prev) => {
-      const next = prev.map((s) => ({ ...s })); // copia superficial
+      const next = prev.map((s) => ({ ...s }));
       const target = next.find((s) => s.id === id);
       if (!target) return prev;
 
       if (target.isSelected) {
-        // des-seleccionar y reindexar
         target.isSelected = false;
         target.selectionOrder = undefined;
         const selected = next
           .filter((s) => s.isSelected && s.selectionOrder)
-          .sort((a, b) => (a.selectionOrder ?? 0) - (b.selectionOrder ?? 0));
+          .sort(
+            (a, b) =>
+              (a.selectionOrder ?? 0) - (b.selectionOrder ?? 0)
+          );
         selected.forEach((s, i) => (s.selectionOrder = i + 1));
       } else {
         const maxOrder = Math.max(
           0,
           ...next
             .filter((s) => s.isSelected && s.selectionOrder)
-            .map((s) => s.selectionOrder as number),
+            .map((s) => s.selectionOrder as number)
         );
         target.isSelected = true;
         target.selectionOrder = maxOrder + 1;
@@ -118,31 +78,22 @@ export function SongManager() {
     });
   };
 
-  const handleAddSong = (newSong: Omit<Song, 'id' | 'isSelected' | 'selectionOrder'>) => {
-    (async () => {
-      try {
-        const created = await apiAddSong({
-          name: newSong.name,
-          lyrics: newSong.lyrics,
-          chords: newSong.chords,
-        });
-        setSongs((prev) =>
-          [...prev, { ...created, isSelected: false, selectionOrder: undefined }].sort((a, b) =>
-            a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }),
-          ),
-        );
-      } catch (e) {
-        console.error(e);
-        // Fallback offline
-        const local: Song = {
-          ...newSong,
-          id: crypto.randomUUID(),
-          isSelected: false,
-          selectionOrder: undefined,
-        } as Song;
-        setSongs((prev) => [...prev, local]);
-      }
-    })();
+  const handleAddSong = async (
+    newSong: Omit<Song, 'id' | 'isSelected' | 'selectionOrder'>
+  ) => {
+    const { data, error } = await supabase
+      .from('songs')
+      .insert([{ name: newSong.name, lyrics: newSong.lyrics, chords: newSong.chords }])
+      .select()
+      .single();
+
+    if (!error && data) {
+      setSongs((prev) =>
+        [...prev, { ...data, isSelected: false, selectionOrder: undefined }].sort((a, b) =>
+          a.name.localeCompare(b.name, 'es', { sensitivity: 'base' })
+        )
+      );
+    }
   };
 
   const handleEditSong = (song: Song) => {
@@ -150,40 +101,45 @@ export function SongManager() {
     setShowEditModal(true);
   };
 
-  const handleSaveEdit = (updated: Song) => {
-    (async () => {
-      try {
-        const saved = await apiUpdateSong(String(updated.id), updated);
-        setSongs((prev) => prev.map((s) => (s.id === saved.id ? { ...s, ...saved } : s)));
-      } catch (e) {
-        console.error(e);
-        setSongs((prev) => prev.map((s) => (s.id === updated.id ? updated : s)));
-      } finally {
-        setEditingSong(null);
-      }
-    })();
+  const handleSaveEdit = async (updated: Song) => {
+    const { data, error } = await supabase
+      .from('songs')
+      .update({
+        name: updated.name,
+        lyrics: updated.lyrics,
+        chords: updated.chords,
+      })
+      .eq('id', updated.id)
+      .select()
+      .single();
+
+    if (!error && data) {
+      setSongs((prev) =>
+        prev.map((s) => (s.id === data.id ? { ...s, ...data } : s))
+      );
+    } else {
+      setSongs((prev) =>
+        prev.map((s) => (s.id === updated.id ? updated : s))
+      );
+    }
+    setEditingSong(null);
   };
 
- const handleDeleteSong = (id: string) => {
-  (async () => {
-    try {
-      await fetch(`${API_URL}/songs/${id}`, { method: "DELETE" });
-      setSongs((prev) => prev.filter((s) => s.id !== id));
-    } catch (e) {
-      console.error(e);
-    }
-  })();
-};
-
+  const handleDeleteSong = async (id: string) => {
+    await supabase.from('songs').delete().eq('id', id);
+    setSongs((prev) => prev.filter((s) => s.id !== id));
+  };
 
   const handleClearSelection = () => {
-    setSongs((prev) => prev.map((s) => ({ ...s, isSelected: false, selectionOrder: undefined })));
+    setSongs((prev) =>
+      prev.map((s) => ({ ...s, isSelected: false, selectionOrder: undefined }))
+    );
   };
 
   const handleDownloadPDF = () => {
     if (selectedSongs.length === 0) return;
     const songsInOrder = [...selectedSongs].sort(
-      (a, b) => (a.selectionOrder || 0) - (b.selectionOrder || 0),
+      (a, b) => (a.selectionOrder || 0) - (b.selectionOrder || 0)
     );
     generateSongbookPDF(songsInOrder);
   };
@@ -226,16 +182,20 @@ export function SongManager() {
         />
       </div>
 
-      {/* Stats (quitamos “Mostrando #”) */}
+      {/* Stats */}
       <div className="mb-6 p-4 bg-muted rounded-lg">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="text-center">
             <div className="text-2xl">{songs.length}</div>
-            <div className="text-sm text-muted-foreground">Total de canciones</div>
+            <div className="text-sm text-muted-foreground">
+              Total de canciones
+            </div>
           </div>
           <div className="text-center">
             <div className="text-2xl">{selectedSongs.length}</div>
-            <div className="text-sm text-muted-foreground">Seleccionadas</div>
+            <div className="text-sm text-muted-foreground">
+              Seleccionadas
+            </div>
           </div>
         </div>
       </div>
@@ -245,13 +205,21 @@ export function SongManager() {
         <div className="mb-6 p-4 border rounded-lg bg-card">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-xl font-semibold">Orden del Cancionero</h3>
-            <Button variant="outline" style={{ borderColor: 'red', color: 'red' }} size="sm" onClick={handleClearSelection}>
+            <Button
+              variant="outline"
+              style={{ borderColor: 'red', color: 'red' }}
+              size="sm"
+              onClick={handleClearSelection}
+            >
               Limpiar lista
             </Button>
           </div>
           <div className="space-y-2">
             {[...selectedSongs]
-              .sort((a, b) => (a.selectionOrder || 0) - (b.selectionOrder || 0))
+              .sort(
+                (a, b) =>
+                  (a.selectionOrder || 0) - (b.selectionOrder || 0)
+              )
               .map((song) => (
                 <div key={song.id} className="flex items-center gap-3">
                   <div className="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-xs">
@@ -264,7 +232,7 @@ export function SongManager() {
         </div>
       )}
 
-      {/* Lista de canciones (con botón Eliminar) */}
+      {/* Lista de canciones */}
       <div className="space-y-3">
         {filteredSongs.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
@@ -273,9 +241,9 @@ export function SongManager() {
               : 'No hay canciones disponibles.'}
           </div>
         ) : (
-          filteredSongs.map((song) => (
-            <div key={song.id} className="flex items-start gap-2">
-              <div className="flex-1">
+          filteredSongs.map((song) => {
+            return (
+              <div key={song.id}>
                 <SongItem
                   song={song}
                   onToggleSelect={handleToggleSelect}
@@ -283,9 +251,8 @@ export function SongManager() {
                   onDelete={handleDeleteSong}
                 />
               </div>
-              
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
