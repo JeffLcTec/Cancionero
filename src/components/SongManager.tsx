@@ -148,11 +148,19 @@ export function SongManager() {
   return (
     <div className="max-w-4xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold">Gestor de Canciones</h1>
-        <p className="text-muted-foreground text-lg">
-          Administra las canciones de la iglesia y genera cancioneros personalizados
-        </p>
-      </div>
+  <div className="flex items-center justify-between">
+    <h1 className="text-3xl font-bold">Gestor de Canciones</h1>
+    <img
+      src="/logo.png"
+      alt="Logo"
+      className="rounded-lg"
+      style={{ width: "260px", height: "auto" }}
+    />
+  </div>
+  <p className="text-muted-foreground text-lg mt-2">
+    Administra las canciones de la iglesia y genera cancioneros personalizados
+  </p>
+</div>
 
       {/* Acciones */}
       <div className="flex flex-wrap gap-4 mb-6">

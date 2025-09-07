@@ -9,7 +9,20 @@ import type { Song } from "../types/song";
  * - Títulos en negrita y más grandes
  * - Letra en monoespaciada para mejor alineación
  */
-export function generateSongbookPDF(selectedSongs: Song[]) {
+async function getBase64Image(url: string): Promise<string> {
+  const res = await fetch(url);
+  const blob = await res.blob();
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+}
+
+
+
+
+export async function generateSongbookPDF(selectedSongs: Song[]) {
   const doc = new jsPDF({
     unit: "pt",      // puntos (72 pt = 1 in)
     format: "letter" // tamaño carta
@@ -122,8 +135,17 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
   const fecha = new Date().toLocaleDateString("es-ES");
   doc.text(`${selectedSongs.length} canciones seleccionadas`, MARGIN_X, MARGIN_TOP + 34);
   doc.text(`Generado el: ${fecha}`, MARGIN_X, MARGIN_TOP + 52);
+  const logo = await getBase64Image("/logo.png");
 
-  divider(MARGIN_TOP + 68);
+  if (logo) {
+  const logoW = 500;   // ancho en pt
+  const logoH = 200;   // alto en pt
+  const logoX = (PAGE_W - logoW) / 2; // centrado horizontal
+  const logoY = MARGIN_TOP + 80;      // debajo del título y fecha
+  doc.addImage(logo, "PNG", logoX, logoY, logoW, logoH);
+}
+
+  divider(MARGIN_TOP + 80 + 200 + 20); // debajo del logo
 
   doc.setFont("helvetica", "italic");
   doc.setFontSize(12);
@@ -131,7 +153,7 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
   const cita =
     "“Canten al Señor un cántico nuevo; canten al Señor, habitantes de toda la tierra.” — Salmo 96:1";
   const citaLines = doc.splitTextToSize(cita, CONTENT_W);
-  doc.text(citaLines, MARGIN_X, MARGIN_TOP + 96);
+  doc.text(citaLines, MARGIN_X, MARGIN_TOP + 96 + 200 + 20);
 
   // Cerrar portada y pasar a la primera página de canciones
   drawFooter(currentPage);
@@ -170,17 +192,13 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
     }
 
     // ----- LETRA -----
-    doc.setTextColor(...COLOR_PRIMARY);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.text("Letra", MARGIN_X, y);
-    y += 14;
+
 
     doc.setDrawColor(230, 230, 230);
     doc.setLineWidth(1);
     doc.line(MARGIN_X - 10, y - 10, MARGIN_X - 10, PAGE_H - MARGIN_BOTTOM);
 
-    doc.setFont("courier", "normal");
+    doc.setFont("courier", "bold");
     doc.setFontSize(11);
 
     const lyricsLines = (song.lyrics || "").split("\n");
@@ -205,9 +223,10 @@ export function generateSongbookPDF(selectedSongs: Song[]) {
           doc.setFont("courier", "bold");
           doc.setTextColor(30, 90, 200);
         } else {
-          // 🎤 Texto → negro normal
-          doc.setFont("courier", "normal");
+          // 🎤 Texto → negro bold
+          doc.setFont("Montserrat", "bold");
           doc.setTextColor(40, 40, 40);
+          doc.setFontSize(14);
         }
 
         doc.text(part, cursorX, y);
