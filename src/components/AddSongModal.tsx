@@ -40,6 +40,36 @@ export function AddSongModal({ open, onOpenChange, onSave }: AddSongModalProps) 
     onOpenChange(false);
   };
 
+const normalizeForUrl = (str: string) => {
+  return str
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // elimina acentos
+    .replace(/\s+/g, "_") // espacios → guiones bajos
+    .replace(/[^a-z0-9_]/g, ""); // solo letras, números y _
+};
+
+const handleSearchInLacuerda = () => {
+  if (!name.trim()) return;
+
+  if (name.includes("-")) {
+    // formato: "Autor - Canción"
+    const [artistRaw, songRaw] = name.split("-").map((s) => s.trim());
+    if (artistRaw && songRaw) {
+      const artist = normalizeForUrl(artistRaw);
+      const song = normalizeForUrl(songRaw);
+      const url = `https://acordes.lacuerda.net/${artist}/${song}`;
+      window.open(url, "_blank");
+      return;
+    }
+  }
+
+  // búsqueda general
+  const query = encodeURIComponent(name.trim());
+  const url = `https://acordes.lacuerda.net/busca.php?lang=ES&exp=${query}&canc=0&ord=0&ini=0`;
+  window.open(url, "_blank");
+};
+
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
@@ -52,17 +82,27 @@ export function AddSongModal({ open, onOpenChange, onSave }: AddSongModalProps) 
         
         <div className="space-y-4 py-4">
           <div>
-            <Label htmlFor="song-name">Nombre de la Canción</Label>
-            <Input
-              id="song-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ingrese el nombre de la canción"
-            />
+            <Label htmlFor="song-name" className="mb-2 block">Nombre de la Canción</Label>
+            <div className="flex gap-2">
+              <Input
+                id="song-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Autor - Canción o solo Canción"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleSearchInLacuerda}
+                disabled={!name.trim()}
+              >
+                Buscar en LaCuerda
+              </Button>
+            </div>
           </div>
           
           <div>
-            <Label htmlFor="song-lyrics">Letra</Label>
+            <Label htmlFor="song-lyrics"className="mb-2 block">Letra</Label>
             <Textarea
               id="song-lyrics"
               value={lyrics}
@@ -73,7 +113,7 @@ export function AddSongModal({ open, onOpenChange, onSave }: AddSongModalProps) 
           </div>
           
           <div>
-            <Label htmlFor="song-chords">Acordes</Label>
+            <Label htmlFor="song-chords" className="mb-2 block">Acordes</Label>
             <Textarea
               id="song-chords"
               value={chords}
