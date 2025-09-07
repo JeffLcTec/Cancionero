@@ -6,13 +6,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "build": "echo \"no build step for server\""
   },
+  "engines": { "node": "20.x" },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "sqlite3": "^5.1.7",
-    "sqlite": "^5.1.6"
-  },
-  "engines": { "node": "20.x" }
+    "sqlite3": "^5.1.7"
+  }
 }
