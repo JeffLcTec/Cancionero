@@ -199,7 +199,7 @@ export async function generateSongbookPDF(selectedSongs: Song[]) {
     doc.line(MARGIN_X - 10, y - 10, MARGIN_X - 10, PAGE_H - MARGIN_BOTTOM);
 
     doc.setFont("courier", "bold");
-    doc.setFontSize(11);
+    doc.setFontSize(14);
 
     const lyricsLines = (song.lyrics || "").split("\n");
 
