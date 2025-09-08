@@ -226,7 +226,7 @@ export async function generateSongbookPDF(selectedSongs: Song[]) {
           // 🎤 Texto → negro bold
           doc.setFont("Montserrat", "bold");
           doc.setTextColor(40, 40, 40);
-          doc.setFontSize(14);
+          doc.setFontSize(17);
         }
 
         doc.text(part, cursorX, y);
