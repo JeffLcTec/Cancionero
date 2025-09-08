@@ -232,7 +232,7 @@ export async function generateSongbookPDF(selectedSongs: Song[]) {
         doc.text(part, cursorX, y);
         cursorX += doc.getTextWidth(part);
       }
-      y += 16;
+      y += 20;
     }
 
     drawFooter(currentPage);
