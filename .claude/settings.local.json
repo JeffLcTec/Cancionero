@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/jlc10/.claude/plugins/cache/ui-ux-pro-max-skill/ui-ux-pro-max/2.5.0/.claude/skills/ui-ux-pro-max/**)",
+      "Bash(python skills/ui-ux-pro-max/scripts/search.py \"church worship music songbook productivity tool\" --design-system -p \"SCC Cancionero\" -f markdown)",
+      "Bash(python src/ui-ux-pro-max/scripts/search.py \"church worship music songbook productivity tool\" --design-system -p \"SCC Cancionero\" -f markdown)",
+      "Bash(python src/ui-ux-pro-max/scripts/search.py \"worship music religious minimal modern\" --domain style -n 5)",
+      "Bash(python src/ui-ux-pro-max/scripts/search.py \"touch mobile card list animation feedback\" --domain ux -n 5)",
+      "Bash(cat /c/Users/jlc10/OneDrive/Documentos/Proyectos/SCC/sistema-de-creacion-de-canciones/src/styles/*.css)",
+      "Bash(npm run:*)",
+      "Bash(bash:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep -A5 \"song-layout\\\\|song-main\\\\|song-sidebar\" dist/assets/*.css)",
+      "Bash(cat dist/assets/*.css)"
+    ]
+  }
+}

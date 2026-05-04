@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sacred Warm × Aurora Glass — Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #1a0f05;
+  font-family: 'Inter', sans-serif;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+h1.page-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.4rem;
+  color: #fef3c7;
+  text-align: center;
+  margin-bottom: .3rem;
+}
+.page-sub {
+  text-align: center;
+  color: #92400e;
+  font-size: .8rem;
+  margin-bottom: 2rem;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+
+/* ── App frame (simula la pantalla de la app) ── */
+.app-frame {
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(255,220,150,.15);
+  position: relative;
+}
+
+/* ── Background cálido con glow sutil ── */
+.app-bg {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(251,191,36,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 90% 90%, rgba(217,119,6,.12) 0%, transparent 50%),
+    linear-gradient(160deg, #fdf6e8 0%, #fef3c7 40%, #fdf0d8 100%);
+  min-height: 680px;
+  position: relative;
+}
+
+/* ── HEADER ── */
+.app-header {
+  position: relative;
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom: 1px solid rgba(217,119,6,.2);
+  background: rgba(255,251,235,.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.app-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(251,191,36,.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.header-text {}
+.app-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: .6rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #b45309;
+  margin-bottom: .3rem;
+  opacity: .8;
+}
+.app-title {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #44200a;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+}
+.app-subtitle {
+  font-family: 'Lora', serif;
+  font-size: .7rem;
+  font-style: italic;
+  color: #a16207;
+  margin-top: .35rem;
+  opacity: .85;
+}
+.logo-img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #92400e, #d97706);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(180,83,9,.3);
+}
+
+/* Stat pills */
+.stat-row {
+  display: flex;
+  gap: .6rem;
+  margin-top: 1rem;
+}
+.stat-pill {
+  flex: 1;
+  background: rgba(255,255,255,.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(217,119,6,.25);
+  border-radius: 12px;
+  padding: .6rem .75rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.stat-icon {
+  font-size: 1rem;
+}
+.stat-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #78350f;
+  line-height: 1;
+}
+.stat-label {
+  font-size: .55rem;
+  color: #a16207;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── BODY ── */
+.app-body {
+  padding: 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+/* Buttons */
+.btn-row {
+  display: flex;
+  gap: .6rem;
+}
+.btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #92400e, #b45309);
+  color: #fef3c7;
+  border: none;
+  border-radius: 12px;
+  padding: .65rem .9rem;
+  font-family: 'Inter', sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(146,64,14,.3);
+  transition: transform .15s, box-shadow .15s;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(146,64,14,.4); }
+.btn-outline {
+  flex: 1;
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(8px);
+  color: #92400e;
+  border: 1px solid rgba(217,119,6,.4);
+  border-radius: 12px;
+  padding: .65rem .9rem;
+  font-family: 'Inter', sans-serif;
+  font-size: .72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  justify-content: center;
+  transition: background .15s;
+}
+.btn-outline:hover { background: rgba(254,243,199,.7); }
+
+/* Search */
+.search-box {
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(217,119,6,.2);
+  border-radius: 12px;
+  padding: .65rem .9rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .72rem;
+  color: #a16207;
+  font-family: 'Lora', serif;
+  font-style: italic;
+}
+.search-icon { opacity: .5; font-size: .85rem; }
+
+/* ── SONGBOOK ORDER section ── */
+.songbook-panel {
+  background: rgba(255,255,255,.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(217,119,6,.3);
+  border-radius: 16px;
+  padding: .85rem 1rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 4px 20px rgba(180,83,9,.08);
+}
+.songbook-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .65rem;
+}
+.songbook-title {
+  font-family: 'Playfair Display', serif;
+  font-size: .85rem;
+  font-weight: 700;
+  color: #44200a;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+.clear-btn {
+  font-size: .6rem;
+  color: #dc2626;
+  background: rgba(220,38,38,.08);
+  border: 1px solid rgba(220,38,38,.2);
+  border-radius: 6px;
+  padding: .15rem .5rem;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .3rem 0;
+  border-bottom: 1px solid rgba(217,119,6,.1);
+}
+.order-item:last-child { border-bottom: none; }
+.order-badge {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #92400e, #d97706);
+  color: #fef3c7;
+  font-size: .58rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(146,64,14,.35);
+}
+.order-name {
+  font-family: 'Lora', serif;
+  font-size: .72rem;
+  color: #44200a;
+}
+
+/* ── SONG CARDS ── */
+.song-list { display: flex; flex-direction: column; gap: .5rem; }
+
+.song-card {
+  background: rgba(255,255,255,.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(217,119,6,.18);
+  border-radius: 14px;
+  padding: .8rem 1rem;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s, background .2s, border-color .2s;
+  box-shadow: 0 2px 8px rgba(180,83,9,.06), inset 0 1px 0 rgba(255,255,255,.8);
+  position: relative;
+  overflow: hidden;
+}
+.song-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, #d97706, #92400e);
+  opacity: 0;
+  transition: opacity .2s;
+  border-radius: 3px 0 0 3px;
+}
+.song-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(180,83,9,.15), inset 0 1px 0 rgba(255,255,255,.9);
+  background: rgba(255,255,255,.75);
+  border-color: rgba(217,119,6,.35);
+}
+.song-card:hover::before { opacity: 1; }
+.song-card.selected {
+  background: rgba(254,243,199,.7);
+  border-color: rgba(180,83,9,.4);
+  box-shadow: 0 4px 20px rgba(180,83,9,.15), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.song-card.selected::before { opacity: 1; }
+
+.song-card-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: .75rem;
+}
+.select-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s;
+  margin-top: 1px;
+}
+.select-btn:hover { transform: scale(1.1); }
+.select-btn.empty {
+  border: 2px solid rgba(180,83,9,.3);
+  background: rgba(255,255,255,.5);
+  color: #b45309;
+  font-size: .85rem;
+}
+.select-btn.filled {
+  background: linear-gradient(135deg, #92400e, #d97706);
+  color: #fef3c7;
+  font-size: .65rem;
+  font-weight: 700;
+  box-shadow: 0 3px 10px rgba(146,64,14,.35);
+}
+
+.song-info { flex: 1; min-width: 0; }
+.song-title {
+  font-family: 'Lora', serif;
+  font-size: .85rem;
+  font-weight: 600;
+  color: #44200a;
+  line-height: 1.3;
+}
+.song-preview {
+  font-family: 'Lora', serif;
+  font-size: .68rem;
+  font-style: italic;
+  color: #a16207;
+  margin-top: .2rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  opacity: .8;
+}
+.song-actions {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  flex-shrink: 0;
+}
+.action-btn {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+.action-btn.edit { color: #92400e; }
+.action-btn.edit:hover { background: #fef3c7; }
+.action-btn.del { color: #dc2626; }
+.action-btn.del:hover { background: #fee2e2; }
+
+/* ── TYPOGRAPHY PALETTE (below) ── */
+.type-showcase {
+  max-width: 480px;
+  margin: 2rem auto 0;
+  background: rgba(255,251,235,.08);
+  border: 1px solid rgba(255,220,150,.12);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+.type-showcase h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  color: #fde68a;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.type-pair {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.type-option {
+  flex: 1;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,220,150,.1);
+  border-radius: 12px;
+  padding: .9rem;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.type-option:hover, .type-option.selected { border-color: rgba(217,119,6,.5); background: rgba(217,119,6,.08); }
+.type-heading { font-size: 1.1rem; color: #fde68a; margin-bottom: .2rem; }
+.type-body { font-size: .7rem; color: #a16207; line-height: 1.5; }
+.type-label { font-size: .55rem; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: .1em; color: #6b5240; margin-bottom: .5rem; }
+
+.check-mark {
+  font-size: .55rem;
+  color: #d97706;
+  float: right;
+  opacity: 0;
+  transition: opacity .2s;
+}
+.type-option.selected .check-mark, .type-option:hover .check-mark { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">Sacred Warm × Aurora Glass</h1>
+<p class="page-sub">Cómo se vería la app — mockup interactivo</p>
+
+<!-- ── APP MOCKUP ── -->
+<div class="app-frame">
+  <div class="app-bg">
+
+    <!-- HEADER -->
+    <div class="app-header">
+      <div class="header-top">
+        <div class="header-text">
+          <div class="app-eyebrow">✦ Ministerio de Alabanza</div>
+          <div class="app-title">Cancionero</div>
+          <div class="app-subtitle">Administra las canciones de la iglesia</div>
+        </div>
+        <div class="logo-img">🎵</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-pill">
+          <span class="stat-icon">🎼</span>
+          <div>
+            <div class="stat-num">148</div>
+            <div class="stat-label">Canciones</div>
+          </div>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-icon">📖</span>
+          <div>
+            <div class="stat-num" style="color:#d97706">2</div>
+            <div class="stat-label">Seleccionadas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="app-body">
+
+      <!-- Buttons -->
+      <div class="btn-row">
+        <button class="btn-primary">＋ Agregar Canción</button>
+        <button class="btn-outline">⬇ Descargar PDF <span style="background:rgba(180,83,9,.15);padding:.05rem .3rem;border-radius:4px;font-size:.6rem">2</span></button>
+      </div>
+
+      <!-- Search -->
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <span>Buscar canciones...</span>
+      </div>
+
+      <!-- Songbook order -->
+      <div class="songbook-panel">
+        <div class="songbook-header">
+          <div class="songbook-title">📖 Orden del Cancionero</div>
+          <button class="clear-btn">Limpiar lista</button>
+        </div>
+        <div class="order-item">
+          <div class="order-badge">1</div>
+          <span class="order-name">Ven, Espíritu Santo</span>
+        </div>
+        <div class="order-item">
+          <div class="order-badge">2</div>
+          <span class="order-name">Santo, Santo, Santo</span>
+        </div>
+      </div>
+
+      <!-- Song list -->
+      <div class="song-list">
+
+        <div class="song-card selected">
+          <div class="song-card-inner">
+            <div class="select-btn filled">1</div>
+            <div class="song-info">
+              <div class="song-title">Ven, Espíritu Santo</div>
+              <div class="song-preview">Ven, te necesito aquí, llena este lugar...</div>
+            </div>
+            <div class="song-actions">
+              <button class="action-btn edit">✏️</button>
+              <button class="action-btn del">🗑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="song-card">
+          <div class="song-card-inner">
+            <div class="select-btn empty">＋</div>
+            <div class="song-info">
+              <div class="song-title">Hosanna</div>
+              <div class="song-preview">Hosanna, hosanna, hosanna en las alturas...</div>
+            </div>
+            <div class="song-actions">
+              <button class="action-btn edit">✏️</button>
+              <button class="action-btn del">🗑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="song-card selected">
+          <div class="song-card-inner">
+            <div class="select-btn filled">2</div>
+            <div class="song-info">
+              <div class="song-title">Santo, Santo, Santo</div>
+              <div class="song-preview">Santo el Señor Dios todopoderoso...</div>
+            </div>
+            <div class="song-actions">
+              <button class="action-btn edit">✏️</button>
+              <button class="action-btn del">🗑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="song-card">
+          <div class="song-card-inner">
+            <div class="select-btn empty">＋</div>
+            <div class="song-info">
+              <div class="song-title">Tu Gracia Me Alcanzó</div>
+              <div class="song-preview">Asombrosa gracia, cuán dulce el sonido...</div>
+            </div>
+            <div class="song-actions">
+              <button class="action-btn edit">✏️</button>
+              <button class="action-btn del">🗑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="song-card">
+          <div class="song-card-inner">
+            <div class="select-btn empty">＋</div>
+            <div class="song-info">
+              <div class="song-title">Al Que Está Sentado en el Trono</div>
+              <div class="song-preview">Al que está sentado en el trono...</div>
+            </div>
+            <div class="song-actions">
+              <button class="action-btn edit">✏️</button>
+              <button class="action-btn del">🗑</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /song-list -->
+    </div><!-- /app-body -->
+  </div><!-- /app-bg -->
+</div><!-- /app-frame -->
+
+
+<!-- ── TYPOGRAPHY PICKER ── -->
+<div class="type-showcase">
+  <h2>¿Qué tipografía te gusta para los títulos?</h2>
+
+  <div class="type-pair">
+    <div class="type-option selected" onclick="pickFont(this, 'playfair')">
+      <div class="type-label">Opción A <span class="check-mark">✓ seleccionada</span></div>
+      <div class="type-heading" style="font-family:'Playfair Display',serif;font-style:italic">Playfair Display</div>
+      <div class="type-body" style="font-family:'Lora',serif">Cuerpo en Lora — legible y con carácter, muy usada en libros religiosos y revistas elegantes.</div>
+    </div>
+    <div class="type-option" onclick="pickFont(this, 'cormorant')">
+      <div class="type-label">Opción B <span class="check-mark">✓ seleccionada</span></div>
+      <div class="type-heading" style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:300;letter-spacing:.02em">Cormorant</div>
+      <div class="type-body" style="font-family:'Lora',serif;font-style:italic">Más fina y delicada. Aún más "litúrgica", evoca misales y textos antiguos.</div>
+    </div>
+  </div>
+
+  <p style="text-align:center;color:#6b5240;font-size:.72rem;font-family:'Lora',serif;font-style:italic">
+    Ambas son Google Fonts gratuitas — le digo cuál preferís y la aplico
+  </p>
+</div>
+
+<script>
+function pickFont(el, name) {
+  document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+// Hover interactions on song cards
+document.querySelectorAll('.song-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const btn = card.querySelector('.select-btn');
+    const isSel = card.classList.contains('selected');
+    if (isSel) {
+      card.classList.remove('selected');
+      btn.className = 'select-btn empty';
+      btn.textContent = '＋';
+    } else {
+      card.classList.add('selected');
+      btn.className = 'select-btn filled';
+      btn.textContent = '✓';
+    }
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Brainstorm — Dirección de diseño</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0f0f13;
+    color: #e8e8f0;
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 2.5rem 1.5rem;
+  }
+  h1 { font-size: 1.5rem; font-weight: 700; text-align: center; margin-bottom: .4rem; color: #fff; }
+  .sub { text-align: center; color: #888; font-size: .9rem; margin-bottom: 2.5rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+
+  /* ── Card shell ── */
+  .card {
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform .2s, border-color .2s, box-shadow .2s;
+    background: #1a1a24;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+  .card.selected { border-color: #7c3aed; box-shadow: 0 0 0 4px rgba(124,58,237,.25); }
+
+  .preview {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card-label {
+    padding: 1rem 1.25rem;
+  }
+  .card-label h3 { font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: .25rem; }
+  .card-label p { font-size: .8rem; color: #888; line-height: 1.5; }
+  .badge {
+    display: inline-block;
+    font-size: .65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    margin-bottom: .5rem;
+  }
+
+  /* ── Selected indicator ── */
+  .check {
+    display: none;
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 28px; height: 28px;
+    background: #7c3aed;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    z-index: 10;
+  }
+  .card.selected .check { display: flex; }
+
+  /* ═══════════════════════════════════════
+     OPCIÓN A — Dark Vibes (streaming)
+  ═══════════════════════════════════════ */
+  .prev-a {
+    background: #0c0c14;
+  }
+  .prev-a .glow {
+    position: absolute;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99,102,241,.4) 0%, transparent 70%);
+    top: -60px; right: -40px;
+  }
+  .prev-a .glow2 {
+    position: absolute;
+    width: 150px; height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(20,184,166,.3) 0%, transparent 70%);
+    bottom: -40px; left: 20px;
+  }
+  .prev-a .hdr {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: .75rem 1rem;
+    display: flex; align-items: center; gap: .5rem;
+    border-bottom: 1px solid rgba(255,255,255,.07);
+    backdrop-filter: blur(8px);
+    background: rgba(12,12,20,.6);
+    z-index: 2;
+  }
+  .prev-a .logo-dot { width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, #6366f1, #14b8a6); }
+  .prev-a .app-name { font-size: .7rem; font-weight: 700; letter-spacing: .05em; color: #fff; }
+  .prev-a .song-list {
+    position: absolute;
+    top: 44px; left: 0; right: 0; bottom: 0;
+    padding: .6rem .8rem;
+    display: flex; flex-direction: column; gap: .35rem;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .prev-a .song-row {
+    display: flex; align-items: center; gap: .5rem;
+    padding: .35rem .5rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .prev-a .song-row.active {
+    background: linear-gradient(90deg, rgba(99,102,241,.2), rgba(20,184,166,.1));
+    border-color: rgba(99,102,241,.35);
+  }
+  .prev-a .num { width: 16px; height: 16px; border-radius: 50%; background: rgba(99,102,241,.8); font-size: .5rem; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+  .prev-a .song-name { font-size: .65rem; color: #c4c4d8; flex: 1; }
+  .prev-a .song-row.active .song-name { color: #a5b4fc; }
+  .prev-a .dots { font-size: .8rem; color: #444; }
+
+  /* ═══════════════════════════════════════
+     OPCIÓN B — Sacred Warm
+  ═══════════════════════════════════════ */
+  .prev-b {
+    background: #fdf8f0;
+  }
+  .prev-b .hdr {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: .7rem 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #e8d9c0;
+    background: #fff;
+    z-index: 2;
+  }
+  .prev-b .app-name { font-size: .7rem; font-weight: 800; color: #78350f; letter-spacing: -.01em; font-family: Georgia, serif; }
+  .prev-b .sub-name { font-size: .55rem; color: #a37840; }
+  .prev-b .add-btn { font-size: .55rem; padding: .2rem .55rem; background: #78350f; color: #fff; border-radius: 6px; }
+  .prev-b .body { position: absolute; top: 42px; left: 0; right: 0; bottom: 0; padding: .5rem .8rem; display: flex; flex-direction: column; gap: .3rem; overflow: hidden; }
+  .prev-b .search { height: 22px; border-radius: 6px; background: #f5ead8; border: 1px solid #e8d9c0; font-size: .55rem; color: #8b6a40; padding: 0 .5rem; display: flex; align-items: center; gap: .3rem; }
+  .prev-b .song-card { background: #fff; border: 1px solid #e8d9c0; border-radius: 8px; padding: .4rem .6rem; display: flex; align-items: center; gap: .5rem; box-shadow: 0 1px 4px rgba(120,53,15,.06); }
+  .prev-b .song-card.sel { border-color: #d97706; background: #fffbeb; }
+  .prev-b .circle { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #d97706; display: flex; align-items: center; justify-content: center; font-size: .5rem; color: #d97706; flex-shrink: 0; }
+  .prev-b .circle.filled { background: #d97706; color: #fff; border-color: #d97706; }
+  .prev-b .sname { font-size: .62rem; color: #44281a; font-weight: 600; flex: 1; }
+  .prev-b .slyr { font-size: .52rem; color: #a37840; }
+
+  /* ═══════════════════════════════════════
+     OPCIÓN C — Aurora Glass
+  ═══════════════════════════════════════ */
+  .prev-c {
+    background: #030014;
+    overflow: hidden;
+  }
+  .prev-c .mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 80% at 80% 20%, rgba(139,92,246,.4) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 20% 80%, rgba(59,130,246,.35) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 50% 50%, rgba(236,72,153,.2) 0%, transparent 60%);
+  }
+  .prev-c .hdr {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: .75rem 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+    backdrop-filter: blur(20px);
+    background: rgba(3,0,20,.5);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    z-index: 2;
+  }
+  .prev-c .app-name { font-size: .7rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+  .prev-c .pill { font-size: .5rem; padding: .15rem .5rem; border-radius: 999px; background: rgba(139,92,246,.3); border: 1px solid rgba(139,92,246,.5); color: #c4b5fd; }
+  .prev-c .glass-cards { position: absolute; top: 44px; left: 0; right: 0; bottom: 0; padding: .5rem .7rem; display: flex; flex-direction: column; gap: .3rem; overflow: hidden; z-index: 1; }
+  .prev-c .gc {
+    backdrop-filter: blur(12px);
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 10px;
+    padding: .4rem .6rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .prev-c .gc.hl { background: rgba(139,92,246,.15); border-color: rgba(139,92,246,.4); }
+  .prev-c .nbadge { width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #ec4899); display: flex; align-items: center; justify-content: center; font-size: .48rem; color: #fff; font-weight: 700; flex-shrink: 0; }
+  .prev-c .plus-badge { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: .7rem; color: rgba(255,255,255,.4); flex-shrink: 0; }
+  .prev-c .gname { font-size: .62rem; color: rgba(255,255,255,.85); flex: 1; }
+  .prev-c .gc.hl .gname { color: #ddd6fe; }
+
+  /* ═══════════════════════════════════════
+     OPCIÓN D — Vibrant Card
+  ═══════════════════════════════════════ */
+  .prev-d {
+    background: #f8f7ff;
+  }
+  .prev-d .hdr {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: .6rem .9rem;
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #8b5cf6 100%);
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 2;
+  }
+  .prev-d .app-name { font-size: .7rem; font-weight: 800; color: #fff; letter-spacing: -.01em; }
+  .prev-d .stats { display: flex; gap: .5rem; }
+  .prev-d .stat-chip { background: rgba(255,255,255,.2); border-radius: 999px; padding: .1rem .45rem; font-size: .52rem; color: #fff; font-weight: 600; }
+  .prev-d .body { position: absolute; top: 38px; left: 0; right: 0; bottom: 0; padding: .5rem .7rem; display: flex; flex-direction: column; gap: .3rem; overflow: hidden; }
+  .prev-d .sc {
+    background: #fff;
+    border-radius: 10px;
+    padding: .4rem .6rem;
+    display: flex; align-items: center; gap: .5rem;
+    box-shadow: 0 2px 8px rgba(109,40,217,.08);
+    border: 1px solid #ede9fe;
+  }
+  .prev-d .sc.sel { background: linear-gradient(135deg, #ede9fe, #faf5ff); border-color: #8b5cf6; }
+  .prev-d .vb { width: 16px; height: 16px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #ec4899); display: flex; align-items: center; justify-content: center; font-size: .48rem; color: #fff; font-weight: 800; flex-shrink: 0; }
+  .prev-d .pb { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #ddd6fe; display: flex; align-items: center; justify-content: center; font-size: .7rem; color: #8b5cf6; flex-shrink: 0; }
+  .prev-d .sn { font-size: .62rem; color: #3b0764; font-weight: 600; flex: 1; }
+  .prev-d .sc.sel .sn { color: #6d28d9; }
+  .prev-d .lyric-preview { font-size: .5rem; color: #9ca3af; }
+
+  /* ── Footer ── */
+  .footer { text-align: center; margin-top: 2rem; color: #555; font-size: .8rem; }
+  .footer span { color: #7c3aed; }
+</style>
+</head>
+<body>
+<h1>¿Qué personalidad tiene la app?</h1>
+<p class="sub">Clickeá la(s) opción(es) que más te llamen la atención — no tienes que elegir solo una</p>
+
+<div class="grid">
+
+  <!-- A: Dark Vibes -->
+  <div class="card" id="card-a" onclick="toggleCard('a')">
+    <div class="check">✓</div>
+    <div class="preview prev-a">
+      <div class="glow"></div>
+      <div class="glow2"></div>
+      <div class="hdr">
+        <div class="logo-dot"></div>
+        <span class="app-name">CANCIONERO</span>
+      </div>
+      <div class="song-list">
+        <div class="song-row active">
+          <div class="num">1</div>
+          <span class="song-name">Ven, Espíritu Santo</span>
+          <span class="dots">···</span>
+        </div>
+        <div class="song-row">
+          <div class="num" style="background:rgba(255,255,255,.1);color:#555">+</div>
+          <span class="song-name">Santo, Santo, Santo</span>
+          <span class="dots">···</span>
+        </div>
+        <div class="song-row">
+          <div class="num" style="background:rgba(255,255,255,.1);color:#555">+</div>
+          <span class="song-name">Tu Gracia Me Alcanzó</span>
+          <span class="dots">···</span>
+        </div>
+        <div class="song-row">
+          <div class="num" style="background:rgba(255,255,255,.1);color:#555">+</div>
+          <span class="song-name">Hosanna</span>
+          <span class="dots">···</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-label">
+      <span class="badge" style="background:rgba(99,102,241,.15);color:#818cf8">Dark · Streaming</span>
+      <h3>Dark Vibes</h3>
+      <p>Inspirado en Spotify / Apple Music. Fondo oscuro, acentos brillantes, siente que tenés poder al usarlo.</p>
+    </div>
+  </div>
+
+  <!-- B: Sacred Warm -->
+  <div class="card" id="card-b" onclick="toggleCard('b')">
+    <div class="check">✓</div>
+    <div class="preview prev-b">
+      <div class="hdr">
+        <div>
+          <div class="app-name">Cancionero</div>
+          <div class="sub-name">Iglesia de la Fe</div>
+        </div>
+        <div class="add-btn">+ Agregar</div>
+      </div>
+      <div class="body">
+        <div class="search">🔍 Buscar canciones...</div>
+        <div class="song-card sel">
+          <div class="circle filled">1</div>
+          <div style="flex:1">
+            <div class="sname">Ven, Espíritu Santo</div>
+            <div class="slyr">Ven, te necesito aquí...</div>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="circle">+</div>
+          <div style="flex:1">
+            <div class="sname">Santo, Santo, Santo</div>
+            <div class="slyr">Santo es el Señor...</div>
+          </div>
+        </div>
+        <div class="song-card">
+          <div class="circle">+</div>
+          <div style="flex:1">
+            <div class="sname">Tu Gracia Me Alcanzó</div>
+            <div class="slyr">Asombrosa gracia...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-label">
+      <span class="badge" style="background:#fef3c7;color:#b45309">Cálido · Clásico</span>
+      <h3>Sacred Warm</h3>
+      <p>Crema, dorado y ámbar. Evoca tradición, calidez y lo sagrado. Tipografía con carácter, limpio y funcional.</p>
+    </div>
+  </div>
+
+  <!-- C: Aurora Glass -->
+  <div class="card" id="card-c" onclick="toggleCard('c')">
+    <div class="check">✓</div>
+    <div class="preview prev-c">
+      <div class="mesh"></div>
+      <div class="hdr">
+        <span class="app-name">Cancionero ✦</span>
+        <span class="pill">148 canciones</span>
+      </div>
+      <div class="glass-cards">
+        <div class="gc hl">
+          <div class="nbadge">1</div>
+          <span class="gname">Ven, Espíritu Santo</span>
+        </div>
+        <div class="gc hl">
+          <div class="nbadge">2</div>
+          <span class="gname">Santo, Santo, Santo</span>
+        </div>
+        <div class="gc">
+          <div class="plus-badge">+</div>
+          <span class="gname">Tu Gracia Me Alcanzó</span>
+        </div>
+        <div class="gc">
+          <div class="plus-badge">+</div>
+          <span class="gname">Hosanna</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-label">
+      <span class="badge" style="background:rgba(139,92,246,.15);color:#a78bfa">Aurora · Glass</span>
+      <h3>Aurora Glass</h3>
+      <p>Gradientes mesh animados, glassmorphism, fondo oscuro místico. Único, dramático, imposible de confundir con IA genérica.</p>
+    </div>
+  </div>
+
+  <!-- D: Vibrant Pop -->
+  <div class="card" id="card-d" onclick="toggleCard('d')">
+    <div class="check">✓</div>
+    <div class="preview prev-d">
+      <div class="hdr">
+        <span class="app-name">Cancionero</span>
+        <div class="stats">
+          <span class="stat-chip">148 🎵</span>
+          <span class="stat-chip">3 sel</span>
+        </div>
+      </div>
+      <div class="body">
+        <div class="sc sel">
+          <div class="vb">1</div>
+          <div style="flex:1">
+            <div class="sn">Ven, Espíritu Santo</div>
+            <div class="lyric-preview">Ven, te necesito aquí...</div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="pb">+</div>
+          <div style="flex:1">
+            <div class="sn">Santo, Santo, Santo</div>
+            <div class="lyric-preview">Santo es el Señor...</div>
+          </div>
+        </div>
+        <div class="sc sel">
+          <div class="vb">2</div>
+          <div style="flex:1">
+            <div class="sn">Tu Gracia Me Alcanzó</div>
+            <div class="lyric-preview">Asombrosa gracia...</div>
+          </div>
+        </div>
+        <div class="sc">
+          <div class="pb">+</div>
+          <div style="flex:1">
+            <div class="sn">Hosanna</div>
+            <div class="lyric-preview">Hosanna en las alturas...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-label">
+      <span class="badge" style="background:#ede9fe;color:#7c3aed">Vibrante · Pop</span>
+      <h3>Vibrant Pop</h3>
+      <p>Header violeta gradient, tarjetas blancas con sombras coloreadas. Energético, moderno, muy app. Animaciones vistosas.</p>
+    </div>
+  </div>
+
+</div>
+
+<p class="footer">Podés seleccionar una o varias opciones — después mezclamos lo mejor de cada una ✦</p>
+
+<script>
+const selected = new Set();
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  if (selected.has(id)) {
+    selected.delete(id);
+    card.classList.remove('selected');
+  } else {
+    selected.add(id);
+    card.classList.add('selected');
+  }
+
+  // Report to parent if running in companion
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'selection', choices: [...selected] }, '*');
+  }
+  // Also write to localStorage for polling
+  try { localStorage.setItem('choices', JSON.stringify([...selected])); } catch(e) {}
+}
+</script>
+</body>
+</html>
